@@ -5,7 +5,9 @@ services:
       - "5431:5433"
     restart: always
     environment:
-      POSTGRES_PASSWORD: changemeinprod!
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
 
   adminer:
     image: adminer:latest
