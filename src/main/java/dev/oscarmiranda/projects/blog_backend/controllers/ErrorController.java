@@ -35,4 +35,17 @@ public class ErrorController {
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException exception) {
+        //TODO Change message for prod
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.CONFLICT);
+    }
+
+
 }
