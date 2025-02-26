@@ -4,6 +4,7 @@ import dev.oscarmiranda.projects.blog_backend.services.AuthenticationService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,6 +50,23 @@ public class AuthenticateServiceImpl implements AuthenticationService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiryMs))
                 .signWith(getSigningKey(),  SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    @Override
+    public UserDetails validateToken(String token) {
+        String username = extractUsername(token);
+
+        return userDetailsService.loadUserByUsername(username);
+    }
+
+    private String extractUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 
     private Key getSigningKey(){
