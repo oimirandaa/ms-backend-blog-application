@@ -2,6 +2,7 @@ package dev.oscarmiranda.projects.blog_backend.services.impl;
 
 import dev.oscarmiranda.projects.blog_backend.domain.CreatePostRequest;
 import dev.oscarmiranda.projects.blog_backend.domain.PostStatus;
+import dev.oscarmiranda.projects.blog_backend.domain.UpdatePostRequest;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Category;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Post;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Tags;
@@ -11,6 +12,7 @@ import dev.oscarmiranda.projects.blog_backend.services.CategoryService;
 import dev.oscarmiranda.projects.blog_backend.services.PostService;
 import dev.oscarmiranda.projects.blog_backend.services.TagsService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +29,6 @@ public class PostServiceImpl implements PostService {
     private final PostsRepository postsRepository;
     private final TagsService tagsService;
     private final CategoryService categoryService;
-
-    private final int WORDS_PER_MINUTE = 200;
 
     @Override
     @Transactional(readOnly = true)
@@ -88,11 +89,42 @@ public class PostServiceImpl implements PostService {
         return postsRepository.save(newPost);
     }
 
+    @Override
+    @Transactional
+    public Post updatePost(UUID id, UpdatePostRequest updatePostRequest) {
+        Post existingPost = postsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found!"));
+
+        existingPost.setTitle(updatePostRequest.getTitle());
+        String content = updatePostRequest.getContent();
+        existingPost.setContent(content);
+        existingPost.setStatus(updatePostRequest.getStatus());
+        existingPost.setReadingTime(calculateReadingTime(content));
+
+        UUID updatePostRequestCategoryId = updatePostRequest.getCategoryId();
+
+        if (!existingPost.getCategory().getId().equals(updatePostRequestCategoryId)) {
+            Category newCategory = categoryService.getCategoryById(updatePostRequestCategoryId);
+            existingPost.setCategory(newCategory);
+        }
+
+        Set<UUID> existingTagsIds = existingPost.getTags().stream().map(Tags::getId).collect(Collectors.toSet());
+        Set<UUID> updatePostRequestTagIds = updatePostRequest.getTagsIds();
+
+        if (!existingTagsIds.equals(updatePostRequestTagIds)) {
+            List<Tags> newTags = tagsService.getTagsById(updatePostRequestTagIds);
+            existingPost.setTags(new HashSet<>(newTags));
+        }
+
+        return postsRepository.save(existingPost);
+    }
+
     private Integer calculateReadingTime(String content){
         if (content == null || content.isEmpty()) return 0;
 
         int wordCount = content.trim().split("\\s+").length;
 
+        int WORDS_PER_MINUTE = 200;
         return (int) Math.ceil((double) wordCount / WORDS_PER_MINUTE);
     }
 }

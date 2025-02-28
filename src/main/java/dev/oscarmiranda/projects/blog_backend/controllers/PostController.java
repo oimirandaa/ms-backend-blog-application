@@ -3,11 +3,14 @@ package dev.oscarmiranda.projects.blog_backend.controllers;
 import dev.oscarmiranda.projects.blog_backend.domain.CreatePostRequest;
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.CreatePostRequestDto;
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.PostDto;
+import dev.oscarmiranda.projects.blog_backend.domain.DTOs.UpdatePostRequestDto;
+import dev.oscarmiranda.projects.blog_backend.domain.UpdatePostRequest;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Post;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.User;
 import dev.oscarmiranda.projects.blog_backend.mappers.PostMapper;
 import dev.oscarmiranda.projects.blog_backend.services.PostService;
 import dev.oscarmiranda.projects.blog_backend.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +49,7 @@ public class PostController {
 
     @PostMapping()
     public ResponseEntity<PostDto> createPost(
-            @RequestBody CreatePostRequestDto createPostRequestDto,
+            @Valid  @RequestBody CreatePostRequestDto createPostRequestDto,
             @RequestAttribute UUID userId
             ){
         User loggedInUser = userService.getUserById(userId);
@@ -57,5 +60,18 @@ public class PostController {
         PostDto createdPostDto = postMapper.toDto(createdPost);
 
         return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable UUID postId,
+            @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto
+            ) {
+        UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequest(updatePostRequestDto);
+
+        Post updatedPost = postService.updatePost(postId, updatePostRequest);
+        PostDto updatedPostDto = postMapper.toDto(updatedPost);
+
+        return ResponseEntity.ok(updatedPostDto);
     }
 }
