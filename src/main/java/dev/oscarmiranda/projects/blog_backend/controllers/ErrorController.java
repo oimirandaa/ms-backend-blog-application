@@ -1,6 +1,7 @@
 package dev.oscarmiranda.projects.blog_backend.controllers;
 
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.ApiErrorResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,16 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(apiErrorResponse, HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
+        //TODO Change message for prod
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(apiErrorResponse, HttpStatus.NOT_FOUND);
     }
 
 

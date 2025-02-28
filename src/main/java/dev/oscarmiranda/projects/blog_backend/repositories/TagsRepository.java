@@ -14,6 +14,5 @@ public interface TagsRepository extends JpaRepository<Tags, UUID> {
 
     @Query("SELECT t FROM Tags t LEFT JOIN FETCH t.posts")
     List<Tags> findAllByPostCount();
-
     List<Tags> findByNameIn(Set<String> tagNames);
 }

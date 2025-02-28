@@ -20,8 +20,5 @@ public class CreateTagsRequest {
     private Set<
             @Size(min = 2, max = 30, message = "Tag Name must be between {min} and {max} characters")
             @Pattern(regexp = "^[\\w\\s-]+$", message = "Tag name can only contain letters, numbers, spaces and hyphens")
-                String
-                > names;
-
-
+                String> names;
 }

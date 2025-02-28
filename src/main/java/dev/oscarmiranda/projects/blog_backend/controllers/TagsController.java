@@ -1,7 +1,7 @@
 package dev.oscarmiranda.projects.blog_backend.controllers;
 
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.CreateTagsRequest;
-import dev.oscarmiranda.projects.blog_backend.domain.DTOs.TagResponse;
+import dev.oscarmiranda.projects.blog_backend.domain.DTOs.TagDto;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Tags;
 import dev.oscarmiranda.projects.blog_backend.mappers.TagsMapper;
 import dev.oscarmiranda.projects.blog_backend.services.TagsService;
@@ -21,25 +21,25 @@ public class TagsController {
     private final TagsMapper tagsMapper;
 
     @GetMapping
-    public ResponseEntity<List<TagResponse>> getAllTags() {
+    public ResponseEntity<List<TagDto>> getAllTags() {
         List<Tags> tags = tagsService.getTags();
 
-        List<TagResponse> tagResponses = tags.stream().map(tagsMapper::toTagResponse).toList();
+        List<TagDto> tagRespons = tags.stream().map(tagsMapper::toTagResponse).toList();
 
-        return ResponseEntity.ok(tagResponses);
+        return ResponseEntity.ok(tagRespons);
     }
 
     @PostMapping
-    public ResponseEntity<List<TagResponse>> createTag(@RequestBody CreateTagsRequest createTagsRequest){
+    public ResponseEntity<List<TagDto>> createTag(@RequestBody CreateTagsRequest createTagsRequest){
         List<Tags> savedTags = tagsService.createTags(createTagsRequest.getNames());
 
-        List<TagResponse> createdTagResponses = savedTags
+        List<TagDto> createdTagRespons = savedTags
                 .stream()
                 .map(tagsMapper::toTagResponse)
                 .toList();
 
         return new ResponseEntity<>(
-                createdTagResponses,
+                createdTagRespons,
                 HttpStatus.CREATED
         );
     }
