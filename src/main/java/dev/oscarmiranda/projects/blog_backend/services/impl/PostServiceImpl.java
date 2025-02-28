@@ -4,6 +4,7 @@ import dev.oscarmiranda.projects.blog_backend.domain.PostStatus;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Category;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Post;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Tags;
+import dev.oscarmiranda.projects.blog_backend.domain.entities.User;
 import dev.oscarmiranda.projects.blog_backend.repositories.PostsRepository;
 import dev.oscarmiranda.projects.blog_backend.services.CategoryService;
 import dev.oscarmiranda.projects.blog_backend.services.PostService;
@@ -54,5 +55,10 @@ public class PostServiceImpl implements PostService {
         }
 
         return  postsRepository.finAllByStatus(PostStatus.PUBLISHED);
+    }
+
+    @Override
+    public List<Post> getDraftPosts(User user) {
+        return postsRepository.findAllByAuthorAndStatus(user, PostStatus.DRAFT);
     }
 }
