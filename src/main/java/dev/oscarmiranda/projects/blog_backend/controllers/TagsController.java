@@ -24,7 +24,7 @@ public class TagsController {
     public ResponseEntity<List<TagDto>> getAllTags() {
         List<Tags> tags = tagsService.getTags();
 
-        List<TagDto> tagRespons = tags.stream().map(tagsMapper::toTagResponse).toList();
+        List<TagDto> tagRespons = tags.stream().map(tagsMapper::toTagDto).toList();
 
         return ResponseEntity.ok(tagRespons);
     }
@@ -35,7 +35,7 @@ public class TagsController {
 
         List<TagDto> createdTagRespons = savedTags
                 .stream()
-                .map(tagsMapper::toTagResponse)
+                .map(tagsMapper::toTagDto)
                 .toList();
 
         return new ResponseEntity<>(

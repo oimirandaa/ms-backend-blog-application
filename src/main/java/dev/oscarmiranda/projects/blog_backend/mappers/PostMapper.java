@@ -1,5 +1,7 @@
 package dev.oscarmiranda.projects.blog_backend.mappers;
 
+import dev.oscarmiranda.projects.blog_backend.domain.CreatePostRequest;
+import dev.oscarmiranda.projects.blog_backend.domain.DTOs.CreatePostRequestDto;
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.PostDto;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Post;
 import org.mapstruct.Mapper;
@@ -12,4 +14,6 @@ public interface PostMapper {
     @Mapping(target = "category", source = "category")
     @Mapping(target = "tags", source = "tags")
     PostDto toDto(Post post);
+
+    CreatePostRequest toCreatePostRequest(CreatePostRequestDto dto);
 }

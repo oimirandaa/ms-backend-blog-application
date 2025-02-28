@@ -1,5 +1,7 @@
 package dev.oscarmiranda.projects.blog_backend.controllers;
 
+import dev.oscarmiranda.projects.blog_backend.domain.CreatePostRequest;
+import dev.oscarmiranda.projects.blog_backend.domain.DTOs.CreatePostRequestDto;
 import dev.oscarmiranda.projects.blog_backend.domain.DTOs.PostDto;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.Post;
 import dev.oscarmiranda.projects.blog_backend.domain.entities.User;
@@ -7,6 +9,7 @@ import dev.oscarmiranda.projects.blog_backend.mappers.PostMapper;
 import dev.oscarmiranda.projects.blog_backend.services.PostService;
 import dev.oscarmiranda.projects.blog_backend.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,5 +42,20 @@ public class PostController {
         List<Post> draftPosts = postService.getDraftPosts(loggedInUser);
         List<PostDto> postDtos = draftPosts.stream().map(postMapper::toDto).toList();
         return ResponseEntity.ok(postDtos);
+    }
+
+    @PostMapping()
+    public ResponseEntity<PostDto> createPost(
+            @RequestBody CreatePostRequestDto createPostRequestDto,
+            @RequestAttribute UUID userId
+            ){
+        User loggedInUser = userService.getUserById(userId);
+        CreatePostRequest createPostRequest = postMapper.toCreatePostRequest(createPostRequestDto);
+
+        Post createdPost = postService.createPost(loggedInUser, createPostRequest);
+
+        PostDto createdPostDto = postMapper.toDto(createdPost);
+
+        return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
     }
 }
