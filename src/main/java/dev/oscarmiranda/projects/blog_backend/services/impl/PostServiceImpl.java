@@ -92,8 +92,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post updatePost(UUID id, UpdatePostRequest updatePostRequest) {
-        Post existingPost = postsRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found!"));
+        Post existingPost = getPost(id);
 
         existingPost.setTitle(updatePostRequest.getTitle());
         String content = updatePostRequest.getContent();
@@ -117,6 +116,18 @@ public class PostServiceImpl implements PostService {
         }
 
         return postsRepository.save(existingPost);
+    }
+
+    @Override
+    public Post getPost(UUID id) {
+        return postsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Post with id " + id + " not found!"));
+    }
+
+    @Override
+    public void deletePost(UUID id) {
+        Post post = getPost(id);
+        postsRepository.delete(post);
     }
 
     private Integer calculateReadingTime(String content){
